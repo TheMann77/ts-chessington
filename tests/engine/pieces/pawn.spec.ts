@@ -4,6 +4,7 @@ import Player from '../../../src/engine/player';
 import Square from '../../../src/engine/square';
 import Rook from '../../../src/engine/pieces/rook';
 import King from '../../../src/engine/pieces/king';
+import {assert} from "chai";
 
 describe('Pawn', () => {
 
@@ -83,6 +84,26 @@ describe('Pawn', () => {
 
             moves.should.not.deep.include(Square.at(5, 3));
         });
+
+        it("white pawn can en passant", () => {
+            const whitePawn = new Pawn(Player.WHITE);
+            const blackPawn = new Pawn(Player.BLACK);
+
+            board.setPiece(Square.at(3, 1), whitePawn);
+            board.setPiece(Square.at(6, 0), blackPawn);
+
+            whitePawn.moveTo(board, Square.at(4, 1))
+            blackPawn.moveTo(board, Square.at(4, 0))
+
+            const moves = whitePawn.getAvailableMoves(board);
+
+            moves.should.have.length(2);
+            moves.should.deep.include(Square.at(5, 0));
+
+            whitePawn.moveTo(board, Square.at(5,0))
+
+            assert(board.getPiece(Square.at(4, 0)) === undefined, "en passant did not remove black pawn")
+        })
     });
 
     describe('black pawns', () => {
@@ -184,4 +205,23 @@ describe('Pawn', () => {
 
         moves.should.not.deep.include(Square.at(4, 3));
     });
+
+    it("black pawn can en passant", () => {
+        const whitePawn = new Pawn(Player.WHITE);
+        const blackPawn = new Pawn(Player.BLACK);
+
+        board.setPiece(Square.at(3, 1), blackPawn);
+        board.setPiece(Square.at(1, 0), whitePawn);
+
+        whitePawn.moveTo(board, Square.at(3, 0))
+
+        const moves = blackPawn.getAvailableMoves(board);
+
+        moves.should.have.length(2);
+        moves.should.deep.include(Square.at(2, 0));
+
+        blackPawn.moveTo(board, Square.at(2,0))
+
+        assert(board.getPiece(Square.at(3, 0)) === undefined, "en passant did not remove white pawn")
+    })
 });

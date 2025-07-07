@@ -1,8 +1,9 @@
 import Player from './player';
 import GameSettings from './gameSettings';
+import gameSettings from './gameSettings';
 import Square from './square';
 import Piece from './pieces/piece';
-import gameSettings from "./gameSettings";
+import Pawn from "./pieces/pawn";
 
 export default class Board {
     public currentPlayer: Player;
@@ -13,6 +14,7 @@ export default class Board {
     public blackPawnStartRow: number;
     public minCol: number;
     public minRow: number;
+    public enPassantCol: number | undefined;
 
     public constructor(currentPlayer?: Player) {
         this.currentPlayer = currentPlayer ? currentPlayer : Player.WHITE;
@@ -22,7 +24,8 @@ export default class Board {
         this.minCol = 0;
         this.minRow = 0;
         this.whitePawnStartRow = 1;
-        this.blackPawnStartRow = this.maxRow - 1
+        this.blackPawnStartRow = this.maxRow - 1;
+        this.enPassantCol = undefined;
     }
 
     public setPiece(square: Square, piece: Piece | undefined) {
@@ -47,10 +50,27 @@ export default class Board {
     public movePiece(fromSquare: Square, toSquare: Square) {
         const movingPiece = this.getPiece(fromSquare);        
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
+            if (movingPiece instanceof Pawn && Math.abs(fromSquare.col - toSquare.col) === 1 && !this.getPiece(toSquare)) {
+                if (movingPiece.player === Player.WHITE) {
+                    this.setPiece(Square.at(toSquare.row-1, toSquare.col), undefined);
+                } else {
+                    this.setPiece(Square.at(toSquare.row+1, toSquare.col), undefined);
+                }
+            }
+
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
             this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE);
+
+            if (movingPiece instanceof Pawn && Math.abs(fromSquare.row - toSquare.row) === 2) {
+                this.enPassantCol = toSquare.col;
+            } else {
+                this.enPassantCol = undefined;
+            }
         }
+
+
+
     }
 
     private createBoard() {

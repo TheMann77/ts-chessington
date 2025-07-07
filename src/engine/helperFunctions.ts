@@ -36,14 +36,16 @@ export function moveByVector(x: number, y: number, current_location: Square, boa
     let taking_pawn = is_pawn && (y !== 0);
     if (new_x >= board.minCol && new_x <= board.maxCol && new_y >= board.minRow && new_y <= board.maxRow) {
         let square = Square.at(new_x, new_y);
-        let piece = board.getPiece(square)
+        let piece = board.getPiece(square);
         if (!piece) {
             if (!taking_pawn) {
+                return [square];
+            } else if (new_y === board.enPassantCol){
                 return [square];
             }
         } else if (piece.player !== player) {
             if (!non_taking_pawn) {
-                return [square]
+                return [square];
             }
         }
     }
