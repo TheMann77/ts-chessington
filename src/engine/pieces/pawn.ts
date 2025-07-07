@@ -21,6 +21,8 @@ export default class Pawn extends Piece {
                     moves.push(...moveByVector(2,0,current_location, board, this.player, true));
                 }
             }
+            moves.push(...moveByVector(1,1,current_location, board, this.player, true))
+            moves.push(...moveByVector(1,-1,current_location, board, this.player, true))
         } else {
             let moves_to_add = moveByVector(-1,0,current_location, board, this.player, true)
             if (moves_to_add.length > 0) {
@@ -29,6 +31,8 @@ export default class Pawn extends Piece {
                     moves.push(...moveByVector(-2,0,current_location, board, this.player, true));
                 }
             }
+            moves.push(...moveByVector(-1,1,current_location, board, this.player, true))
+            moves.push(...moveByVector(-1,-1,current_location, board, this.player, true))
         }
         return moves;
     }

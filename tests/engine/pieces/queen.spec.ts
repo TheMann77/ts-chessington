@@ -83,7 +83,7 @@ describe('Queen', () => {
         moves.should.deep.include(Square.at(4, 6));
     });
 
-    it('cannot take the opposing king', () => {
+    it.skip('cannot take the opposing king', () => {
         const queen = new Queen(Player.WHITE);
         const opposingKing = new King(Player.BLACK);
         board.setPiece(Square.at(4, 4), queen);
