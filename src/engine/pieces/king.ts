@@ -1,6 +1,7 @@
 import Piece from './piece';
 import Player from '../player';
 import Board from '../board';
+import {moveByVector} from "../helperFunctions";
 
 export default class King extends Piece {
     public constructor(player: Player) {
@@ -8,6 +9,18 @@ export default class King extends Piece {
     }
 
     public getAvailableMoves(board: Board) {
-        return new Array(0);
+        let moves =  new Array(0);
+        let current_location = board.findPiece(this);
+
+        moves.push(...moveByVector(-1, 0, current_location))
+        moves.push(...moveByVector(1, 0, current_location))
+        moves.push(...moveByVector(0, -1, current_location))
+        moves.push(...moveByVector(0, 1, current_location))
+        moves.push(...moveByVector(-1, -1, current_location))
+        moves.push(...moveByVector(1, 1, current_location))
+        moves.push(...moveByVector(1, -1, current_location))
+        moves.push(...moveByVector(-1, 1, current_location))
+
+        return moves;
     }
 }
