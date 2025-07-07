@@ -102,6 +102,7 @@ describe('Pawn', () => {
 
             whitePawn.moveTo(board, Square.at(5,0))
 
+
             assert(board.getPiece(Square.at(4, 0)) === undefined, "en passant did not remove black pawn")
         })
     });

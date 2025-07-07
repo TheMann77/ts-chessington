@@ -1,6 +1,7 @@
 import Board from './board';
 import Square from './square';
 import Player from "./player";
+import Rook from "./pieces/rook";
 
 export function moveWithDirection(x: number, y: number, current_location: Square, board: Board, player: Player) {
     let moves =  new Array(0);
@@ -50,4 +51,40 @@ export function moveByVector(x: number, y: number, current_location: Square, boa
         }
     }
     return [];
+}
+
+export function castles(board: Board, player: Player) {
+    const row = player === Player.WHITE ? board.minRow : board.maxRow;
+    let moves =  new Array(0);
+    console.log(board.blackShortCastle, board.blackLongCastle)
+
+    if (((player === Player.WHITE && board.whiteShortCastle) || (player === Player.BLACK && board.blackShortCastle))) {
+        const rook = board.getPiece(Square.at(row, board.maxCol));
+        if (rook instanceof Rook && rook.player === player) {
+            let inWay = false;
+            for (let i = 5; i < board.maxCol; i++) {
+                if (!!board.getPiece(Square.at(row, i))) {
+                    inWay = true;
+                }
+            }
+            if (!inWay) {
+                moves.push(Square.at(row, 6));
+            }
+        }
+    }
+    if ((player === Player.WHITE && board.whiteLongCastle) || (player === Player.BLACK && board.blackLongCastle)) {
+        const rook = board.getPiece(Square.at(row, board.minCol));
+        if (rook instanceof Rook && rook.player === player) {
+            let inWay = false;
+            for (let i = 3; i > board.minCol; i--) {
+                if (!!board.getPiece(Square.at(row, i))) {
+                    inWay = true;
+                }
+            }
+            if (!inWay) {
+                moves.push(Square.at(row, 2));
+            }
+        }
+    }
+    return moves;
 }

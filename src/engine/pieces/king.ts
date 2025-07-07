@@ -1,7 +1,7 @@
 import Piece from './piece';
 import Player from '../player';
 import Board from '../board';
-import {moveByVector} from "../helperFunctions";
+import {castles, moveByVector} from "../helperFunctions";
 
 export default class King extends Piece {
     public constructor(player: Player) {
@@ -20,6 +20,9 @@ export default class King extends Piece {
         moves.push(...moveByVector(1, 1, current_location, board, this.player, false))
         moves.push(...moveByVector(1, -1, current_location, board, this.player, false))
         moves.push(...moveByVector(-1, 1, current_location, board, this.player, false))
+
+        console.log(castles(board, this.player))
+        moves.push(...castles(board, this.player))
 
         return moves;
     }

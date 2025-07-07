@@ -4,6 +4,8 @@ import gameSettings from './gameSettings';
 import Square from './square';
 import Piece from './pieces/piece';
 import Pawn from "./pieces/pawn";
+import King from "./pieces/king";
+import Rook from "./pieces/rook";
 
 export default class Board {
     public currentPlayer: Player;
@@ -15,6 +17,10 @@ export default class Board {
     public minCol: number;
     public minRow: number;
     public enPassantCol: number | undefined;
+    public whiteShortCastle: boolean;
+    public whiteLongCastle: boolean;
+    public blackShortCastle: boolean;
+    public blackLongCastle: boolean;
 
     public constructor(currentPlayer?: Player) {
         this.currentPlayer = currentPlayer ? currentPlayer : Player.WHITE;
@@ -26,6 +32,10 @@ export default class Board {
         this.whitePawnStartRow = 1;
         this.blackPawnStartRow = this.maxRow - 1;
         this.enPassantCol = undefined;
+        this.whiteShortCastle = true;
+        this.whiteLongCastle = true;
+        this.blackShortCastle = true;
+        this.blackLongCastle = true;
     }
 
     public setPiece(square: Square, piece: Piece | undefined) {
@@ -60,13 +70,48 @@ export default class Board {
 
             this.setPiece(toSquare, movingPiece);
             this.setPiece(fromSquare, undefined);
-            this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE);
+
 
             if (movingPiece instanceof Pawn && Math.abs(fromSquare.row - toSquare.row) === 2) {
                 this.enPassantCol = toSquare.col;
             } else {
                 this.enPassantCol = undefined;
             }
+
+            if (movingPiece instanceof King) {
+                if (this.currentPlayer === Player.WHITE) {
+                    this.whiteShortCastle = false;
+                    this.whiteLongCastle = false;
+                } else {
+                    this.blackShortCastle = false;
+                    this.blackLongCastle = false;
+                }
+
+                if (toSquare.col - fromSquare.col === 2) {
+                    const rook = this.getPiece(Square.at(toSquare.row, toSquare.col+1));
+                    this.setPiece(Square.at(toSquare.row, toSquare.col-1), rook);
+                    this.setPiece(Square.at(toSquare.row, toSquare.col+1), undefined);
+                } else if (toSquare.col - fromSquare.col === -2) {
+                    const rook = this.getPiece(Square.at(toSquare.row, toSquare.col-2));
+                    this.setPiece(Square.at(toSquare.row, toSquare.col+1), rook);
+                    this.setPiece(Square.at(toSquare.row, toSquare.col-2), undefined);
+                }
+            } else if (movingPiece instanceof Rook) {
+                if (this.currentPlayer === Player.WHITE) {
+                    if (fromSquare.row === this.minRow && fromSquare.col == this.minCol) {
+                        this.whiteLongCastle = false;
+                    } else if (fromSquare.row === this.minRow && fromSquare.col == this.maxCol) {
+                        this.whiteShortCastle = false;
+                    }
+                } else {
+                    if (fromSquare.row === this.maxRow && fromSquare.col == this.minCol) {
+                        this.blackLongCastle = false;
+                    } else if (fromSquare.row === this.maxRow && fromSquare.col == this.maxCol) {
+                        this.blackShortCastle = false;
+                    }
+                }
+            }
+            this.currentPlayer = (this.currentPlayer === Player.WHITE ? Player.BLACK : Player.WHITE);
         }
 
 
