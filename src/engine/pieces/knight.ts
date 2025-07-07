@@ -24,7 +24,7 @@ export default class Knight extends Piece {
         ]
 
         for (let i = 0; i < vs.length; i++) {
-            moves.push(...moveByVector(vs[i][0], vs[i][1], current_location, board))
+            moves.push(...moveByVector(vs[i][0], vs[i][1], current_location, board, this.player, false))
         }
 
 

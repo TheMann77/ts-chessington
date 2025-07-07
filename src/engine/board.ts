@@ -2,14 +2,27 @@ import Player from './player';
 import GameSettings from './gameSettings';
 import Square from './square';
 import Piece from './pieces/piece';
+import gameSettings from "./gameSettings";
 
 export default class Board {
     public currentPlayer: Player;
     private readonly board: (Piece | undefined)[][];
+    public maxCol: number;
+    public maxRow: number;
+    public whitePawnStartRow: number;
+    public blackPawnStartRow: number;
+    public minCol: number;
+    public minRow: number;
 
     public constructor(currentPlayer?: Player) {
         this.currentPlayer = currentPlayer ? currentPlayer : Player.WHITE;
         this.board = this.createBoard();
+        this.maxCol = gameSettings.BOARD_SIZE-1;
+        this.maxRow = gameSettings.BOARD_SIZE-1;
+        this.minCol = 0;
+        this.minRow = 0;
+        this.whitePawnStartRow = 1;
+        this.blackPawnStartRow = this.maxRow - 1
     }
 
     public setPiece(square: Square, piece: Piece | undefined) {
