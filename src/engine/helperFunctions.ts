@@ -2,15 +2,25 @@ import Board from './board';
 import Square from './square';
 import player from "./player";
 
-export function moveWithDirection(x: number, y: number, current_location: Square) {
+export function moveWithDirection(x: number, y: number, current_location: Square, board: Board) {
     let moves =  new Array(0);
     let i = current_location.row + x;
     let j = current_location.col + y;
+    let hit_piece = false
 
-    while (i >= 0 && i <= 7 && j >= 0 && j <= 7) {
-        moves.push(Square.at(i, j));
-        i += x;
-        j += y;
+
+    while (i >= 0 && i <= 7 && j >= 0 && j <= 7 && !hit_piece) {
+        let square = Square.at(i, j);
+
+        if (!board.getPiece(square)) {
+            moves.push(square);
+            i += x;
+            j += y;
+        } else {
+            hit_piece = true;
+        }
+
+
     }
 
     return moves;

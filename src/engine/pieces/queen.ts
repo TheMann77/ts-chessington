@@ -12,14 +12,14 @@ export default class Queen extends Piece {
         let moves =  new Array(0);
         let current_location = board.findPiece(this);
 
-        moves.push(...moveWithDirection(-1, 0, current_location))
-        moves.push(...moveWithDirection(1, 0, current_location))
-        moves.push(...moveWithDirection(0, -1, current_location))
-        moves.push(...moveWithDirection(0, 1, current_location))
-        moves.push(...moveWithDirection(-1, -1, current_location))
-        moves.push(...moveWithDirection(1, 1, current_location))
-        moves.push(...moveWithDirection(1, -1, current_location))
-        moves.push(...moveWithDirection(-1, 1, current_location))
+        moves.push(...moveWithDirection(-1, 0, current_location, board))
+        moves.push(...moveWithDirection(1, 0, current_location, board))
+        moves.push(...moveWithDirection(0, -1, current_location, board))
+        moves.push(...moveWithDirection(0, 1, current_location, board))
+        moves.push(...moveWithDirection(-1, -1, current_location, board))
+        moves.push(...moveWithDirection(1, 1, current_location, board))
+        moves.push(...moveWithDirection(1, -1, current_location, board))
+        moves.push(...moveWithDirection(-1, 1, current_location, board))
 
         return moves;
     }
