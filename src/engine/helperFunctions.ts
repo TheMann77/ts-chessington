@@ -16,9 +16,15 @@ export function moveWithDirection(x: number, y: number, current_location: Square
     return moves;
 }
 
-export function moveByVector(x: number, y: number, current_location: Square) {
+export function moveByVector(x: number, y: number, current_location: Square, board: Board) {
     if (current_location.row >= 0 && current_location.row <= 7 && current_location.col >= 0 && current_location.col <= 7) {
-        return [Square.at(current_location.row + x, current_location.col + y)];
+        let square = Square.at(current_location.row + x, current_location.col + y);
+
+        if (!board.getPiece(square)) {
+            console.log(board.getPiece(square))
+            return [square];
+        }
+        return [];
     } else {
         return [];
     }

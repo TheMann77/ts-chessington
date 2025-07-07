@@ -13,17 +13,22 @@ export default class Pawn extends Piece {
         let moves =  new Array(0);
         let current_location = board.findPiece(this);
         if (this.player === Player.WHITE) {
-            moves.push(...moveByVector(1,0,current_location));
-            if (current_location.row === 1) {
-                moves.push(...moveByVector(2,0,current_location));
+            let moves_to_add = moveByVector(1,0,current_location, board)
+            if (moves_to_add.length > 0) {
+                moves.push(...moves_to_add);
+                if (current_location.row === 1) {
+                    moves.push(...moveByVector(2,0,current_location, board));
+                }
             }
         } else {
-            moves.push(...moveByVector(-1,0,current_location));
-            if (current_location.row === 6) {
-                moves.push(...moveByVector(-2,0,current_location));
+            let moves_to_add = moveByVector(-1,0,current_location, board)
+            if (moves_to_add.length > 0) {
+                moves.push(...moves_to_add);
+                if (current_location.row === 6) {
+                    moves.push(...moveByVector(-2,0,current_location, board));
+                }
             }
         }
-        moves.push();
         return moves;
     }
 }

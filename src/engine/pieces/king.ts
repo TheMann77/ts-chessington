@@ -12,14 +12,14 @@ export default class King extends Piece {
         let moves =  new Array(0);
         let current_location = board.findPiece(this);
 
-        moves.push(...moveByVector(-1, 0, current_location))
-        moves.push(...moveByVector(1, 0, current_location))
-        moves.push(...moveByVector(0, -1, current_location))
-        moves.push(...moveByVector(0, 1, current_location))
-        moves.push(...moveByVector(-1, -1, current_location))
-        moves.push(...moveByVector(1, 1, current_location))
-        moves.push(...moveByVector(1, -1, current_location))
-        moves.push(...moveByVector(-1, 1, current_location))
+        moves.push(...moveByVector(-1, 0, current_location, board))
+        moves.push(...moveByVector(1, 0, current_location, board))
+        moves.push(...moveByVector(0, -1, current_location, board))
+        moves.push(...moveByVector(0, 1, current_location, board))
+        moves.push(...moveByVector(-1, -1, current_location, board))
+        moves.push(...moveByVector(1, 1, current_location, board))
+        moves.push(...moveByVector(1, -1, current_location, board))
+        moves.push(...moveByVector(-1, 1, current_location, board))
 
         return moves;
     }
