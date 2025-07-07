@@ -15,3 +15,11 @@ export function moveWithDirection(x: number, y: number, current_location: Square
 
     return moves;
 }
+
+export function moveByVector(x: number, y: number, current_location: Square) {
+    if (current_location.row >= 0 && current_location.row <= 7 && current_location.col >= 0 && current_location.col <= 7) {
+        return [Square.at(current_location.row + x, current_location.col + y)];
+    } else {
+        return [];
+    }
+}

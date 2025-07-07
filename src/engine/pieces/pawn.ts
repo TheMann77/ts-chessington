@@ -2,6 +2,7 @@ import Piece from './piece';
 import Player from '../player';
 import Board from '../board';
 import Square from '../square'
+import {moveByVector} from "../helperFunctions";
 
 export default class Pawn extends Piece {
     public constructor(player: Player) {
@@ -12,14 +13,14 @@ export default class Pawn extends Piece {
         let moves =  new Array(0);
         let current_location = board.findPiece(this);
         if (this.player === Player.WHITE) {
-            moves.push(Square.at(current_location.row+1, current_location.col));
+            moves.push(...moveByVector(1,0,current_location));
             if (current_location.row === 1) {
-                moves.push(Square.at(3, current_location.col));
+                moves.push(...moveByVector(2,0,current_location));
             }
         } else {
-            moves.push(Square.at(current_location.row-1, current_location.col));
+            moves.push(...moveByVector(-1,0,current_location));
             if (current_location.row === 6) {
-                moves.push(Square.at(4, current_location.col));
+                moves.push(...moveByVector(-2,0,current_location));
             }
         }
         moves.push();
