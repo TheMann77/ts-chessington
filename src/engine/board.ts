@@ -6,6 +6,7 @@ import Piece from './pieces/piece';
 import Pawn from "./pieces/pawn";
 import King from "./pieces/king";
 import Rook from "./pieces/rook";
+import Queen from "./pieces/queen";
 
 export default class Board {
     public currentPlayer: Player;
@@ -76,6 +77,12 @@ export default class Board {
                 this.enPassantCol = toSquare.col;
             } else {
                 this.enPassantCol = undefined;
+            }
+
+            if (movingPiece instanceof Pawn) {
+                if (toSquare.row === this.minRow || toSquare.row === this.maxRow) {
+                    this.setPiece(toSquare, new Queen(movingPiece.player));
+                }
             }
 
             if (movingPiece instanceof King) {

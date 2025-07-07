@@ -5,6 +5,7 @@ import Square from '../../../src/engine/square';
 import Rook from '../../../src/engine/pieces/rook';
 import King from '../../../src/engine/pieces/king';
 import {assert} from "chai";
+import Queen from "../../../src/engine/pieces/queen";
 
 describe('Pawn', () => {
 
@@ -224,5 +225,26 @@ describe('Pawn', () => {
         blackPawn.moveTo(board, Square.at(2,0))
 
         assert(board.getPiece(Square.at(3, 0)) === undefined, "en passant did not remove white pawn")
+    })
+
+    it("white pawn queens", () => {
+        const whitePawn = new Pawn(Player.WHITE);
+        board.setPiece(Square.at(6, 0), whitePawn);
+
+        whitePawn.moveTo(board, Square.at(7, 0))
+        assert(board.getPiece(Square.at(7, 0)) instanceof Queen, "white pawn did not queen")
+    })
+
+    it("black pawn queens", () => {
+        const blackPawn = new Pawn(Player.BLACK);
+        board.setPiece(Square.at(1, 0), blackPawn);
+
+        const whitePawn = new Pawn(Player.WHITE);
+        board.setPiece(Square.at(1, 7), whitePawn);
+
+        whitePawn.moveTo(board, Square.at(2, 7))
+
+        blackPawn.moveTo(board, Square.at(0, 0))
+        assert(board.getPiece(Square.at(0, 0)) instanceof Queen, "black pawn did not queen")
     })
 });
