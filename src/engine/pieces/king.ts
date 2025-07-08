@@ -21,7 +21,6 @@ export default class King extends Piece {
         moves.push(...moveByVector(1, -1, current_location, board, this.player, false))
         moves.push(...moveByVector(-1, 1, current_location, board, this.player, false))
 
-        console.log(castles(board, this.player))
         moves.push(...castles(board, this.player))
 
         return moves;

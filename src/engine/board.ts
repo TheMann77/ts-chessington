@@ -22,12 +22,13 @@ export default class Board {
     public whiteLongCastle: boolean;
     public blackShortCastle: boolean;
     public blackLongCastle: boolean;
+    public isCopy: boolean;
 
-    public constructor(currentPlayer?: Player) {
+    public constructor(currentPlayer?: Player, board?: (Piece | undefined)[][]) {
         this.currentPlayer = currentPlayer ? currentPlayer : Player.WHITE;
-        this.board = this.createBoard();
-        this.maxCol = gameSettings.BOARD_SIZE-1;
-        this.maxRow = gameSettings.BOARD_SIZE-1;
+        this.board = board ? board : this.createBoard();
+        this.maxCol = gameSettings.BOARD_SIZE - 1;
+        this.maxRow = gameSettings.BOARD_SIZE - 1;
         this.minCol = 0;
         this.minRow = 0;
         this.whitePawnStartRow = 1;
@@ -37,6 +38,7 @@ export default class Board {
         this.whiteLongCastle = true;
         this.blackShortCastle = true;
         this.blackLongCastle = true;
+        this.isCopy = false;
     }
 
     public setPiece(square: Square, piece: Piece | undefined) {
@@ -59,13 +61,13 @@ export default class Board {
     }
 
     public movePiece(fromSquare: Square, toSquare: Square) {
-        const movingPiece = this.getPiece(fromSquare);        
+        const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
             if (movingPiece instanceof Pawn && Math.abs(fromSquare.col - toSquare.col) === 1 && !this.getPiece(toSquare)) {
                 if (movingPiece.player === Player.WHITE) {
-                    this.setPiece(Square.at(toSquare.row-1, toSquare.col), undefined);
+                    this.setPiece(Square.at(toSquare.row - 1, toSquare.col), undefined);
                 } else {
-                    this.setPiece(Square.at(toSquare.row+1, toSquare.col), undefined);
+                    this.setPiece(Square.at(toSquare.row + 1, toSquare.col), undefined);
                 }
             }
 
@@ -95,13 +97,13 @@ export default class Board {
                 }
 
                 if (toSquare.col - fromSquare.col === 2) {
-                    const rook = this.getPiece(Square.at(toSquare.row, toSquare.col+1));
-                    this.setPiece(Square.at(toSquare.row, toSquare.col-1), rook);
-                    this.setPiece(Square.at(toSquare.row, toSquare.col+1), undefined);
+                    const rook = this.getPiece(Square.at(toSquare.row, toSquare.col + 1));
+                    this.setPiece(Square.at(toSquare.row, toSquare.col - 1), rook);
+                    this.setPiece(Square.at(toSquare.row, toSquare.col + 1), undefined);
                 } else if (toSquare.col - fromSquare.col === -2) {
-                    const rook = this.getPiece(Square.at(toSquare.row, toSquare.col-2));
-                    this.setPiece(Square.at(toSquare.row, toSquare.col+1), rook);
-                    this.setPiece(Square.at(toSquare.row, toSquare.col-2), undefined);
+                    const rook = this.getPiece(Square.at(toSquare.row, toSquare.col - 2));
+                    this.setPiece(Square.at(toSquare.row, toSquare.col + 1), rook);
+                    this.setPiece(Square.at(toSquare.row, toSquare.col - 2), undefined);
                 }
             } else if (movingPiece instanceof Rook) {
                 if (this.currentPlayer === Player.WHITE) {
@@ -122,7 +124,54 @@ export default class Board {
         }
 
 
+        //Note: player has already changed here
+        if (!this.isCopy && !this.hasMove()) {
+            if (this.inCheck(this.currentPlayer)) {
+                console.log((this.currentPlayer === Player.WHITE ? "Black" : "White") + " wins");
+            } else {
+                console.log("Draw by stalemate");
+            }
+        }
 
+    }
+
+
+    public inCheck(player : Player, squareFrom: Square | undefined = undefined, squareTo: Square | undefined = undefined) {
+        const opp : Player = player === Player.WHITE ? Player.BLACK : Player.WHITE;
+        let newBoard : Board = this;
+        if (!!squareFrom && !!squareTo) {
+            newBoard = this.copy(player);
+            newBoard.movePiece(squareFrom, squareTo);
+        }
+
+        let kingSquare : Square | undefined = undefined;
+        for (let i=newBoard.minRow; i <= newBoard.maxRow; i++) {
+            for (let j=newBoard.minCol; j <= newBoard.maxRow; j++) {
+                let piece = newBoard.getPiece(Square.at(i,j))
+                if (!!piece && piece.player === player && piece instanceof King) {
+                    kingSquare = Square.at(i,j);
+                }
+            }
+        }
+        if (!kingSquare) {return false}
+        for (let i=newBoard.minRow; i <= newBoard.maxRow; i++) {
+            for (let j=newBoard.minCol; j <= newBoard.maxRow; j++) {
+                let piece = newBoard.getPiece(Square.at(i,j))
+                if (!!piece && piece.player === opp && newBoard.contains(piece.getAvailableMoves(newBoard), kingSquare)) {
+                    return true
+                }
+            }
+        }
+        return false;
+    }
+
+    private contains(arr : Square[], elem : Square) {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i].equals(elem)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private createBoard() {
@@ -130,6 +179,39 @@ export default class Board {
         for (let i = 0; i < board.length; i++) {
             board[i] = new Array(GameSettings.BOARD_SIZE);
         }
-        return board;
+        return board
+    }
+
+    private copy(player : Player) {
+        const oldGrid = this.board;
+        const newGrid : (Piece | undefined)[][] = [];
+        for (let i = 0 ; i < oldGrid.length; i++) {
+            const newRow : (Piece | undefined)[] = [];
+            for (let j = 0 ; j < oldGrid[i].length; j++) {
+                newRow.push(oldGrid[i][j]);
+            }
+            newGrid.push(newRow);
+        }
+        const newBoard = new Board(player, newGrid);
+        newBoard.isCopy = true;
+        return newBoard;
+    }
+
+    private hasMove() {
+        let pieceExists = false;
+        for (let i=this.minRow; i <= this.maxRow; i++) {
+            for (let j=this.minCol; j <= this.maxRow; j++) {
+                let piece = this.getPiece(Square.at(i,j))
+                if (!!piece && piece.player === this.currentPlayer) {
+                    pieceExists = true;
+                    //console.log(piece.getAvailableMoves(this));
+                    if (piece.getAvailableMoves(this).length > 0) {
+                        return true
+                    }
+                }
+            }
+        }
+        if (!pieceExists) {return true}
+        return false;
     }
 }

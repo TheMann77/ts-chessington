@@ -4,6 +4,7 @@ import Player from '../../../src/engine/player';
 import Square from '../../../src/engine/square';
 import Pawn from '../../../src/engine/pieces/pawn';
 import King from '../../../src/engine/pieces/king';
+import Rook from "../../../src/engine/pieces/rook";
 
 describe('Bishop', () => {
     let board: Board;
@@ -88,4 +89,17 @@ describe('Bishop', () => {
 
         moves.should.not.deep.include(Square.at(6, 6));
     });
+
+    it('cannot move into check', () => {
+        const king = new King(Player.WHITE);
+        const rook = new Rook(Player.BLACK);
+        const bishop = new Bishop(Player.WHITE);
+        board.setPiece(Square.at(0, 4), king);
+        board.setPiece(Square.at(7, 4), rook);
+        board.setPiece(Square.at(1,4), bishop);
+
+        const moves = bishop.getAvailableMoves(board);
+
+        moves.should.have.length(0);
+    })
 });

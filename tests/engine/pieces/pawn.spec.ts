@@ -6,6 +6,7 @@ import Rook from '../../../src/engine/pieces/rook';
 import King from '../../../src/engine/pieces/king';
 import {assert} from "chai";
 import Queen from "../../../src/engine/pieces/queen";
+import Bishop from "../../../src/engine/pieces/bishop";
 
 describe('Pawn', () => {
 
@@ -246,5 +247,18 @@ describe('Pawn', () => {
 
         blackPawn.moveTo(board, Square.at(0, 0))
         assert(board.getPiece(Square.at(0, 0)) instanceof Queen, "black pawn did not queen")
+    });
+
+    it('cannot move into check', () => {
+        const king = new King(Player.WHITE);
+        const bishop = new Bishop(Player.BLACK);
+        const pawn = new Pawn(Player.WHITE);
+        board.setPiece(Square.at(0, 4), king);
+        board.setPiece(Square.at(3, 1), bishop);
+        board.setPiece(Square.at(1,3), pawn);
+
+        const moves = pawn.getAvailableMoves(board);
+
+        moves.should.have.length(0);
     })
 });

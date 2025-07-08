@@ -263,19 +263,35 @@ describe('King', () => {
 
     it('black king cannot castle under threat', () => {
         const king = new King(Player.BLACK);
-        const rook = new Rook(Player.BLACK);
+        const rook1 = new Rook(Player.BLACK);
+        const rook2 = new Rook(Player.BLACK);
         const oppRook1 = new Rook(Player.WHITE);
         const oppRook2 = new Rook(Player.WHITE);
         board.setPiece(Square.at(7, 4), king);
-        board.setPiece(Square.at(7, 7), rook);
-        board.setPiece(Square.at(0, 1), oppRook1);
+        board.setPiece(Square.at(7, 0), rook1);
+        board.setPiece(Square.at(7, 7), rook2);
+        board.setPiece(Square.at(0, 2), oppRook1);
         board.setPiece(Square.at(0, 6), oppRook2);
 
         const moves = king.getAvailableMoves(board);
 
-        moves.should.have.length(5);
         moves.should.not.deep.include(Square.at(7,2));
         moves.should.not.deep.include(Square.at(7,6));
+        moves.should.have.length(5);
+
     });
+
+    it('cannot move into check', () => {
+        const king = new King(Player.WHITE);
+        const rook = new Rook(Player.BLACK);
+        board.setPiece(Square.at(0, 4), king);
+        board.setPiece(Square.at(7, 5), rook);
+
+        const moves = king.getAvailableMoves(board);
+
+        moves.should.have.length(3);
+        moves.should.not.deep.include(Square.at(0,5));
+        moves.should.not.deep.include(Square.at(1,5));
+    })
 
 });

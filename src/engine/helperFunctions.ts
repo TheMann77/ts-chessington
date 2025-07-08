@@ -9,17 +9,20 @@ export function moveWithDirection(x: number, y: number, current_location: Square
     let j = current_location.col + y;
     let hit_piece = false
 
-
     while (i >= board.minCol && i <= board.maxCol && j >= board.minRow && j <= board.maxRow && !hit_piece) {
         let square = Square.at(i, j);
         let piece = board.getPiece(square);
         if (!piece) {
-            moves.push(square);
+            if (board.isCopy || !board.inCheck(player, current_location, square)) {
+                moves.push(square);
+            }
             i += x;
             j += y;
         } else {
             if (piece.player !== player) {
-                moves.push(square);
+                if (board.isCopy || !board.inCheck(player, current_location, square)) {
+                    moves.push(square);
+                }
             }
             hit_piece = true;
         }
@@ -38,15 +41,17 @@ export function moveByVector(x: number, y: number, current_location: Square, boa
     if (new_x >= board.minCol && new_x <= board.maxCol && new_y >= board.minRow && new_y <= board.maxRow) {
         let square = Square.at(new_x, new_y);
         let piece = board.getPiece(square);
-        if (!piece) {
-            if (!taking_pawn) {
-                return [square];
-            } else if (new_y === board.enPassantCol){
-                return [square];
-            }
-        } else if (piece.player !== player) {
-            if (!non_taking_pawn) {
-                return [square];
+        if (board.isCopy || !board.inCheck(player, current_location, square)) {
+            if (!piece) {
+                if (!taking_pawn) {
+                    return [square];
+                } else if (new_y === board.enPassantCol) {
+                    return [square];
+                }
+            } else if (piece.player !== player) {
+                if (!non_taking_pawn) {
+                    return [square];
+                }
             }
         }
     }
@@ -56,18 +61,19 @@ export function moveByVector(x: number, y: number, current_location: Square, boa
 export function castles(board: Board, player: Player) {
     const row = player === Player.WHITE ? board.minRow : board.maxRow;
     let moves =  new Array(0);
-    console.log(board.blackShortCastle, board.blackLongCastle)
 
     if (((player === Player.WHITE && board.whiteShortCastle) || (player === Player.BLACK && board.blackShortCastle))) {
         const rook = board.getPiece(Square.at(row, board.maxCol));
         if (rook instanceof Rook && rook.player === player) {
-            let inWay = false;
-            for (let i = 5; i < board.maxCol; i++) {
-                if (!!board.getPiece(Square.at(row, i))) {
-                    inWay = true;
+            let castlingBlocked = false;
+            for (let i = 4; i < board.maxCol; i++) {
+                if (i !== 4 && !!board.getPiece(Square.at(row, i))) {
+                    castlingBlocked = true;
+                } else if (!board.isCopy && board.inCheck(player, Square.at(row, 4), Square.at(row, i))) {
+                    castlingBlocked = true;
                 }
             }
-            if (!inWay) {
+            if (!castlingBlocked) {
                 moves.push(Square.at(row, 6));
             }
         }
@@ -75,13 +81,15 @@ export function castles(board: Board, player: Player) {
     if ((player === Player.WHITE && board.whiteLongCastle) || (player === Player.BLACK && board.blackLongCastle)) {
         const rook = board.getPiece(Square.at(row, board.minCol));
         if (rook instanceof Rook && rook.player === player) {
-            let inWay = false;
+            let castlingBlocked = false;
             for (let i = 3; i > board.minCol; i--) {
-                if (!!board.getPiece(Square.at(row, i))) {
-                    inWay = true;
+                if (i !== 4 && !!board.getPiece(Square.at(row, i))) {
+                    castlingBlocked = true;
+                } else if (i >= 2 && !board.isCopy && board.inCheck(player, Square.at(row, 4), Square.at(row, i))) {
+                    castlingBlocked = true;
                 }
             }
-            if (!inWay) {
+            if (!castlingBlocked) {
                 moves.push(Square.at(row, 2));
             }
         }
