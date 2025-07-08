@@ -90,7 +90,7 @@ export function castles(board: Board, player: Player) {
         return false;
     }
 
-    if (((player === Player.WHITE && board.whiteShortCastle) || (player === Player.BLACK && board.blackShortCastle))) {
+    if ((player === Player.WHITE && board.whiteShortCastle) || (player === Player.BLACK && board.blackShortCastle)) {
         const rook = board.getPiece(Square.at(castlingRow, board.maxCol));
         if (rook instanceof Rook && rook.player === player) {
             if (!squaresBlocked(5, 6) && !squaresChecked(4,6)) {
