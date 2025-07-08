@@ -63,6 +63,8 @@ export default class Board {
     public movePiece(fromSquare: Square, toSquare: Square) {
         const movingPiece = this.getPiece(fromSquare);
         if (!!movingPiece && movingPiece.player === this.currentPlayer) {
+
+            //Take pawn in en Passant:
             if (movingPiece instanceof Pawn && Math.abs(fromSquare.col - toSquare.col) === 1 && !this.getPiece(toSquare)) {
                 if (movingPiece.player === Player.WHITE) {
                     this.setPiece(Square.at(toSquare.row - 1, toSquare.col), undefined);
@@ -96,6 +98,7 @@ export default class Board {
                     this.blackLongCastle = false;
                 }
 
+                //Move rook in castling:
                 if (toSquare.col - fromSquare.col === 2) {
                     const rook = this.getPiece(Square.at(toSquare.row, toSquare.col + 1));
                     this.setPiece(Square.at(toSquare.row, toSquare.col - 1), rook);
@@ -105,7 +108,9 @@ export default class Board {
                     this.setPiece(Square.at(toSquare.row, toSquare.col + 1), rook);
                     this.setPiece(Square.at(toSquare.row, toSquare.col - 2), undefined);
                 }
-            } else if (movingPiece instanceof Rook) {
+            }
+
+            if (movingPiece instanceof Rook) {
                 if (this.currentPlayer === Player.WHITE) {
                     if (fromSquare.row === this.minRow && fromSquare.col == this.minCol) {
                         this.whiteLongCastle = false;
@@ -136,6 +141,10 @@ export default class Board {
     }
 
     public inCheck(player: Player, squareFrom: Square | undefined = undefined, squareTo: Square | undefined = undefined) {
+        if (this.isCopy) {
+            return false
+        }
+
         const opp: Player = player === Player.WHITE ? Player.BLACK : Player.WHITE;
         let newBoard: Board = this.copy(player);
         if (!!squareFrom && !!squareTo) {

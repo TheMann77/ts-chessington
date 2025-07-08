@@ -9,8 +9,8 @@ export default class Knight extends Piece {
     }
 
     public getAvailableMoves(board: Board) {
-        let moves =  new Array(0);
-        let current_location = board.findPiece(this);
+        const moves =  [];
+        const currentPosition = board.findPiece(this);
 
         let vs = [
             [2,1],
@@ -24,7 +24,7 @@ export default class Knight extends Piece {
         ]
 
         for (let i = 0; i < vs.length; i++) {
-            moves.push(...moveByVector(vs[i][0], vs[i][1], current_location, board, this.player, false))
+            moves.push(...moveByVector(vs[i][0], vs[i][1], currentPosition, board, this.player))
         }
 
 

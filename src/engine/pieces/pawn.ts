@@ -2,7 +2,7 @@ import Piece from './piece';
 import Player from '../player';
 import Board from '../board';
 import Square from '../square'
-import {moveByVector} from "../helperFunctions";
+import {movePawnByVector} from "../helperFunctions";
 
 export default class Pawn extends Piece {
     public constructor(player: Player) {
@@ -10,30 +10,22 @@ export default class Pawn extends Piece {
     }
 
     public getAvailableMoves(board: Board) {
-        let moves =  new Array(0);
-        let current_location = board.findPiece(this);
+        const moves =  [];
+        const currentPosition = board.findPiece(this);
 
-        if (this.player === Player.WHITE) {
-            let moves_to_add = moveByVector(1,0,current_location, board, this.player, true)
-            if (moves_to_add.length > 0) {
-                moves.push(...moves_to_add);
-                if (current_location.row === board.whitePawnStartRow) {
-                    moves.push(...moveByVector(2,0,current_location, board, this.player, true));
-                }
+        const forward = this.player === Player.WHITE ? 1 : -1
+        const pawnStartRow = this.player === Player.WHITE ? board.whitePawnStartRow : board.blackPawnStartRow;
+
+        let singleSquareMoves = movePawnByVector(forward,0,currentPosition, board, this.player)
+        if (singleSquareMoves.length > 0) {
+            moves.push(...singleSquareMoves);
+            if (currentPosition.row === pawnStartRow) {
+                moves.push(...movePawnByVector(2*forward,0,currentPosition, board, this.player));
             }
-            moves.push(...moveByVector(1,1,current_location, board, this.player, true))
-            moves.push(...moveByVector(1,-1,current_location, board, this.player, true))
-        } else {
-            let moves_to_add = moveByVector(-1,0,current_location, board, this.player, true)
-            if (moves_to_add.length > 0) {
-                moves.push(...moves_to_add);
-                if (current_location.row === board.blackPawnStartRow) {
-                    moves.push(...moveByVector(-2,0,current_location, board, this.player, true));
-                }
-            }
-            moves.push(...moveByVector(-1,1,current_location, board, this.player, true))
-            moves.push(...moveByVector(-1,-1,current_location, board, this.player, true))
         }
+        moves.push(...movePawnByVector(forward,1,currentPosition, board, this.player))
+        moves.push(...movePawnByVector(forward,-1,currentPosition, board, this.player))
+
         return moves;
     }
 }

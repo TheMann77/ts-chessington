@@ -10,13 +10,14 @@ export default class Rook extends Piece {
     }
 
     public getAvailableMoves(board: Board) {
-        let moves =  new Array(0);
-        let current_location = board.findPiece(this);
+        const moves =  [];
+        const currentPosition = board.findPiece(this);
 
-        moves.push(...moveWithDirection(-1, 0, current_location, board, this.player))
-        moves.push(...moveWithDirection(1, 0, current_location, board, this.player))
-        moves.push(...moveWithDirection(0, -1, current_location, board, this.player))
-        moves.push(...moveWithDirection(0, 1, current_location, board, this.player))
+        const moveDirections = [[-1,0],[0,-1],[0,1],[1,0]]
+
+        for (let direction of moveDirections) {
+            moves.push(...moveWithDirection(direction[0], direction[1], currentPosition, board, this.player))
+        }
 
         return moves;
     }
