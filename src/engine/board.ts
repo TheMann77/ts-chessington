@@ -135,29 +135,31 @@ export default class Board {
 
     }
 
-
-    public inCheck(player : Player, squareFrom: Square | undefined = undefined, squareTo: Square | undefined = undefined) {
-        const opp : Player = player === Player.WHITE ? Player.BLACK : Player.WHITE;
-        let newBoard : Board = this;
+    public inCheck(player: Player, squareFrom: Square | undefined = undefined, squareTo: Square | undefined = undefined) {
+        const opp: Player = player === Player.WHITE ? Player.BLACK : Player.WHITE;
+        let newBoard: Board = this.copy(player);
         if (!!squareFrom && !!squareTo) {
-            newBoard = this.copy(player);
             newBoard.movePiece(squareFrom, squareTo);
         }
 
-        let kingSquare : Square | undefined = undefined;
-        for (let i=newBoard.minRow; i <= newBoard.maxRow; i++) {
-            for (let j=newBoard.minCol; j <= newBoard.maxRow; j++) {
-                let piece = newBoard.getPiece(Square.at(i,j))
-                if (!!piece && piece.player === player && piece instanceof King) {
-                    kingSquare = Square.at(i,j);
-                }
-            }
+        const kingSquare: Square | undefined = newBoard.findKing(player);
+
+        if (kingSquare === undefined) {
+            return false
         }
-        if (!kingSquare) {return false}
-        for (let i=newBoard.minRow; i <= newBoard.maxRow; i++) {
-            for (let j=newBoard.minCol; j <= newBoard.maxRow; j++) {
-                let piece = newBoard.getPiece(Square.at(i,j))
-                if (!!piece && piece.player === opp && newBoard.contains(piece.getAvailableMoves(newBoard), kingSquare)) {
+
+        const doesPieceAttackKing = (square: Square) => {
+
+            let piece = newBoard.getPiece(square)
+            if (!piece || piece.player !== opp) {
+                return false;
+            }
+            return newBoard.contains(piece.getAvailableMoves(newBoard), kingSquare);
+        }
+
+        for (let i = newBoard.minRow; i <= newBoard.maxRow; i++) {
+            for (let j = newBoard.minCol; j <= newBoard.maxRow; j++) {
+                if (doesPieceAttackKing(Square.at(i, j))) {
                     return true
                 }
             }
@@ -165,7 +167,19 @@ export default class Board {
         return false;
     }
 
-    private contains(arr : Square[], elem : Square) {
+    private findKing(player: Player) {
+        for (let i = this.minRow; i <= this.maxRow; i++) {
+            for (let j = this.minCol; j <= this.maxRow; j++) {
+                let piece = this.getPiece(Square.at(i, j))
+                if (!!piece && piece.player === player && piece instanceof King) {
+                    return Square.at(i, j);
+                }
+            }
+        }
+        return undefined;
+    }
+
+    private contains(arr: Square[], elem: Square) {
         for (let i = 0; i < arr.length; i++) {
             if (arr[i].equals(elem)) {
                 return true;
@@ -182,16 +196,9 @@ export default class Board {
         return board
     }
 
-    private copy(player : Player) {
+    private copy(player: Player) {
         const oldGrid = this.board;
-        const newGrid : (Piece | undefined)[][] = [];
-        for (let i = 0 ; i < oldGrid.length; i++) {
-            const newRow : (Piece | undefined)[] = [];
-            for (let j = 0 ; j < oldGrid[i].length; j++) {
-                newRow.push(oldGrid[i][j]);
-            }
-            newGrid.push(newRow);
-        }
+        const newGrid: (Piece | undefined)[][] = oldGrid.map(row=>[...row]);
         const newBoard = new Board(player, newGrid);
         newBoard.isCopy = true;
         return newBoard;
@@ -199,19 +206,18 @@ export default class Board {
 
     private hasMove() {
         let pieceExists = false;
-        for (let i=this.minRow; i <= this.maxRow; i++) {
-            for (let j=this.minCol; j <= this.maxRow; j++) {
-                let piece = this.getPiece(Square.at(i,j))
+        for (let i = this.minRow; i <= this.maxRow; i++) {
+            for (let j = this.minCol; j <= this.maxRow; j++) {
+                let piece = this.getPiece(Square.at(i, j))
                 if (!!piece && piece.player === this.currentPlayer) {
                     pieceExists = true;
-                    //console.log(piece.getAvailableMoves(this));
                     if (piece.getAvailableMoves(this).length > 0) {
                         return true
                     }
                 }
             }
         }
-        if (!pieceExists) {return true}
-        return false;
+        return !pieceExists;
+
     }
 }

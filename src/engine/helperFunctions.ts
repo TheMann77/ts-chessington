@@ -3,28 +3,28 @@ import Square from './square';
 import Player from "./player";
 import Rook from "./pieces/rook";
 
-export function moveWithDirection(x: number, y: number, current_location: Square, board: Board, player: Player) {
-    let moves =  new Array(0);
-    let i = current_location.row + x;
-    let j = current_location.col + y;
-    let hit_piece = false
+export function moveWithDirection(moveByRows: number, moveByColumns: number, currentPosition: Square, board: Board, player: Player) {
+    const moves =  [];
+    let newPositionRow = currentPosition.row + moveByRows;
+    let newPositionColumn = currentPosition.col + moveByColumns;
+    let haveHitPiece = false
 
-    while (i >= board.minCol && i <= board.maxCol && j >= board.minRow && j <= board.maxRow && !hit_piece) {
-        let square = Square.at(i, j);
+    while (newPositionRow >= board.minCol && newPositionRow <= board.maxCol && newPositionColumn >= board.minRow && newPositionColumn <= board.maxRow && !haveHitPiece) {
+        let square = Square.at(newPositionRow, newPositionColumn);
         let piece = board.getPiece(square);
         if (!piece) {
-            if (board.isCopy || !board.inCheck(player, current_location, square)) {
+            if (board.isCopy || !board.inCheck(player, currentPosition, square)) {
                 moves.push(square);
             }
-            i += x;
-            j += y;
+            newPositionRow += moveByRows;
+            newPositionColumn += moveByColumns;
         } else {
             if (piece.player !== player) {
-                if (board.isCopy || !board.inCheck(player, current_location, square)) {
+                if (board.isCopy || !board.inCheck(player, currentPosition, square)) {
                     moves.push(square);
                 }
             }
-            hit_piece = true;
+            haveHitPiece = true;
         }
 
 
